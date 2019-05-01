@@ -8,6 +8,7 @@ import com.github.jorgecastillo.kotlinandroid.io.algebras.business.model.Charact
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.SuperHeroViewModel
 import com.karumi.marvelapiclient.model.CharacterDto
 import com.karumi.marvelapiclient.model.MarvelImage.Size.PORTRAIT_UNCANNY
+import kotlinx.coroutines.Dispatchers
 
 interface SuperHeroesView {
 
@@ -40,26 +41,35 @@ object Presentation {
             Navigation.goToHeroDetailsPage(ctx, heroId)
 
     private fun displayErrors(view: SuperHeroesView, t: Throwable): IO<Unit> = fx {
-        when (CharacterError.fromThrowable(t)) {
-            is CharacterError.NotFoundError -> view.showNotFoundError()
-            is CharacterError.UnknownServerError -> view.showGenericError()
-            is CharacterError.AuthenticationError -> view.showAuthenticationError()
+        continueOn(Dispatchers.Main)
+        !effect {
+            when (CharacterError.fromThrowable(t)) {
+                is CharacterError.NotFoundError -> view.showNotFoundError()
+                is CharacterError.UnknownServerError -> view.showGenericError()
+                is CharacterError.AuthenticationError -> view.showAuthenticationError()
+            }
         }
     }
 
-    fun drawSuperHeroes(view: SuperHeroesListView): IO<Unit> = fx {
+    fun getAllHeroes(view: SuperHeroesListView): IO<Unit> = fx {
         val result = !HeroesUseCases.getHeroes().handleError {
             displayErrors(view, it); emptyList()
         }
+        !displayHeroes(view, result)
+    }
 
-        view.drawHeroes(result.map {
-            SuperHeroViewModel(
-                    it.id,
-                    it.name,
-                    it.thumbnail.getImageUrl(PORTRAIT_UNCANNY),
-                    it.description
-            )
-        })
+    private fun displayHeroes(view: SuperHeroesListView, result: List<CharacterDto>) = fx {
+        continueOn(Dispatchers.Main)
+        !effect {
+            view.drawHeroes(result.map {
+                SuperHeroViewModel(
+                        it.id,
+                        it.name,
+                        it.thumbnail.getImageUrl(PORTRAIT_UNCANNY),
+                        it.description
+                )
+            })
+        }
     }
 
     fun drawSuperHeroDetails(heroId: String, view: SuperHeroDetailView): IO<Unit> = fx {

@@ -3,7 +3,8 @@ package com.github.jorgecastillo.kotlinandroid.io.runtime.ui
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import arrow.effects.fix
+import arrow.effects.extensions.io.unsafeRun.runBlocking
+import arrow.unsafe
 import com.github.jorgecastillo.kotlinandroid.R
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.Presentation
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.SuperHeroesListView
@@ -26,30 +27,30 @@ class SuperHeroListActivity : AppCompatActivity(), SuperHeroesListView {
         heroesList.setHasFixedSize(true)
         heroesList.layoutManager = LinearLayoutManager(this)
         adapter = HeroesCardAdapter(itemClick = {
-            Presentation.onHeroListItemClick(this, it.heroId).fix().unsafeRunAsync {}
+            unsafe { runBlocking { Presentation.onHeroListItemClick(this@SuperHeroListActivity, it.heroId) } }
         })
         heroesList.adapter = adapter
     }
 
     override fun onResume() {
         super.onResume()
-        Presentation.drawSuperHeroes(this).fix().unsafeRunAsync {}
+        unsafe { runBlocking { Presentation.getAllHeroes(this@SuperHeroListActivity) } }
     }
 
-    override fun drawHeroes(heroes: List<SuperHeroViewModel>) = runOnUiThread {
+    override fun drawHeroes(heroes: List<SuperHeroViewModel>) {
         adapter.characters = heroes
         adapter.notifyDataSetChanged()
     }
 
-    override fun showNotFoundError() = runOnUiThread {
+    override fun showNotFoundError() {
         Snackbar.make(heroesList, R.string.not_found, Snackbar.LENGTH_SHORT).show()
     }
 
-    override fun showGenericError() = runOnUiThread {
+    override fun showGenericError() {
         Snackbar.make(heroesList, R.string.generic, Snackbar.LENGTH_SHORT).show()
     }
 
-    override fun showAuthenticationError() = runOnUiThread {
+    override fun showAuthenticationError() {
         Snackbar.make(heroesList, R.string.authentication, Snackbar.LENGTH_SHORT).show()
     }
 }
