@@ -3,9 +3,8 @@ package com.github.jorgecastillo.kotlinandroid.io.runtime.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import arrow.effects.fix
 import com.github.jorgecastillo.kotlinandroid.R
 import com.github.jorgecastillo.kotlinandroid.R.string
@@ -13,6 +12,7 @@ import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.Presentation
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.SuperHeroDetailView
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.extensions.loadImageAsync
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.SuperHeroViewModel
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_detail.*
 
 class SuperHeroDetailActivity : AppCompatActivity(), SuperHeroDetailView {

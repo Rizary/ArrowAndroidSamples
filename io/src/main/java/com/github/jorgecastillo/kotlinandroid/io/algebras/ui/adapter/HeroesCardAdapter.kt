@@ -1,9 +1,9 @@
 package com.github.jorgecastillo.kotlinandroid.io.algebras.ui.adapter
 
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.github.jorgecastillo.kotlinandroid.R
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.adapter.HeroesCardAdapter.ViewHolder
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.SuperHeroViewModel
@@ -31,7 +31,7 @@ class HeroesCardAdapter(
 
     fun bind(hero: SuperHeroViewModel) {
       with(hero) {
-        Picasso.with(itemView.context).load(photoUrl).into(itemView.picture)
+        Picasso.get().load(photoUrl).into(itemView.picture)
         itemView.setOnClickListener { itemClick(this) }
       }
     }
