@@ -7,6 +7,7 @@ import com.karumi.marvelapiclient.CharacterApiClient
 import com.karumi.marvelapiclient.MarvelApiConfig
 import com.karumi.marvelapiclient.model.CharacterDto
 import com.karumi.marvelapiclient.model.CharactersQuery
+import kotlinx.coroutines.Dispatchers
 
 object DataSource {
 
@@ -29,7 +30,9 @@ object DataSource {
 
     fun fetchAllHeroes(): IO<List<CharacterDto>> = fx {
         val query = fetchHeroesQuery()
-        !NonBlocking.effect { fetchHeroes(query) }
+        val heroes = !NonBlocking.effect { fetchHeroes(query) }
+        continueOn(Dispatchers.Main)
+        heroes
     }
 
     fun fetchHeroDetails(heroId: String): IO<CharacterDto> = fx {

@@ -2,6 +2,7 @@ package com.github.jorgecastillo.kotlinandroid.io.algebras.ui
 
 import android.content.Context
 import arrow.effects.IO
+import arrow.effects.extensions.io.applicativeError.handleError
 import arrow.effects.extensions.io.fx.fx
 import com.github.jorgecastillo.kotlinandroid.io.algebras.business.HeroesUseCases
 import com.github.jorgecastillo.kotlinandroid.io.algebras.business.model.CharacterError
@@ -41,7 +42,6 @@ object Presentation {
             Navigation.goToHeroDetailsPage(ctx, heroId)
 
     private fun displayErrors(view: SuperHeroesView, t: Throwable): IO<Unit> = fx {
-        continueOn(Dispatchers.Main)
         !effect {
             when (CharacterError.fromThrowable(t)) {
                 is CharacterError.NotFoundError -> view.showNotFoundError()
@@ -52,14 +52,7 @@ object Presentation {
     }
 
     fun getAllHeroes(view: SuperHeroesListView): IO<Unit> = fx {
-        val result = !HeroesUseCases.getHeroes().handleError {
-            displayErrors(view, it); emptyList()
-        }
-        !displayHeroes(view, result)
-    }
-
-    private fun displayHeroes(view: SuperHeroesListView, result: List<CharacterDto>) = fx {
-        continueOn(Dispatchers.Main)
+        val result = !HeroesUseCases.getHeroes()
         !effect {
             view.drawHeroes(result.map {
                 SuperHeroViewModel(
@@ -70,20 +63,23 @@ object Presentation {
                 )
             })
         }
+    }.handleError {
+        displayErrors(view, it)
     }
 
     fun drawSuperHeroDetails(heroId: String, view: SuperHeroDetailView): IO<Unit> = fx {
-        val result = !HeroesUseCases.getHeroDetails(heroId).handleError {
-            displayErrors(view, it); CharacterDto()
+        val result = !HeroesUseCases.getHeroDetails(heroId)
+        !effect {
+            view.drawHero(
+                    SuperHeroViewModel(
+                            result.id,
+                            result.name,
+                            result.thumbnail.getImageUrl(PORTRAIT_UNCANNY),
+                            result.description
+                    )
+            )
         }
-
-        view.drawHero(
-                SuperHeroViewModel(
-                        result.id,
-                        result.name,
-                        result.thumbnail.getImageUrl(PORTRAIT_UNCANNY),
-                        result.description
-                )
-        )
+    }.handleError {
+        displayErrors(view, it)
     }
 }
