@@ -1,15 +1,14 @@
 package com.github.jorgecastillo.kotlinandroid.io.algebras.business
 
-import arrow.effects.IO
-import com.github.jorgecastillo.kotlinandroid.io.algebras.persistence.HeroesRepository
+import arrow.Kind
+import arrow.effects.typeclasses.suspended.concurrent.Fx
+import com.github.jorgecastillo.kotlinandroid.io.algebras.persistence.CachePolicy
+import com.github.jorgecastillo.kotlinandroid.io.algebras.persistence.getHeroDetailsWithCachePolicy
+import com.github.jorgecastillo.kotlinandroid.io.algebras.persistence.getHeroesWithCachePolicy
 import com.karumi.marvelapiclient.model.CharacterDto
 
-object HeroesUseCases {
+fun <F> Fx<F>.getHeroes(): Kind<F, List<CharacterDto>> =
+        getHeroesWithCachePolicy(CachePolicy.NetworkOnly)
 
-  fun getHeroes(): IO<List<CharacterDto>> =
-      HeroesRepository.getHeroesWithCachePolicy(
-          HeroesRepository.CachePolicy.NetworkOnly)
-
-  fun getHeroDetails(heroId: String): IO<CharacterDto> =
-      HeroesRepository.getHeroDetails(HeroesRepository.CachePolicy.NetworkOnly, heroId)
-}
+fun <F> Fx<F>.getHeroDetails(heroId: String): Kind<F, CharacterDto> =
+        getHeroDetailsWithCachePolicy(CachePolicy.NetworkOnly, heroId)

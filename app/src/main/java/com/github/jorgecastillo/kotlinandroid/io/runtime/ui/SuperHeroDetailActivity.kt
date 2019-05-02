@@ -6,13 +6,15 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import arrow.effects.IO
+import arrow.effects.extensions.io.fx.fx
 import arrow.effects.extensions.io.unsafeRun.runNonBlocking
 import arrow.unsafe
 import com.github.jorgecastillo.kotlinandroid.R
 import com.github.jorgecastillo.kotlinandroid.R.string
-import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.Presentation
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.SuperHeroDetailView
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.extensions.loadImageAsync
+import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.getSuperHeroDetails
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.HeroViewState
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_detail.*
@@ -42,7 +44,7 @@ class SuperHeroDetailActivity : AppCompatActivity(), SuperHeroDetailView {
                 closeWithError()
             } else {
                 unsafe {
-                    runNonBlocking({ Presentation.drawSuperHeroDetails(heroId, this@SuperHeroDetailActivity) }, {})
+                    runNonBlocking({ IO.fx().getSuperHeroDetails(heroId, this@SuperHeroDetailActivity) }, {})
                 }
             }
         } ?: closeWithError()
