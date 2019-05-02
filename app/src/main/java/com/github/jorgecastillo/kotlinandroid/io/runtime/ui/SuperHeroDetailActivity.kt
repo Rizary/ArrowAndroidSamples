@@ -13,7 +13,7 @@ import com.github.jorgecastillo.kotlinandroid.R.string
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.Presentation
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.SuperHeroDetailView
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.extensions.loadImageAsync
-import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.SuperHeroViewModel
+import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.HeroViewState
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_detail.*
 
@@ -60,7 +60,7 @@ class SuperHeroDetailActivity : AppCompatActivity(), SuperHeroDetailView {
         loader.visibility = View.GONE
     }
 
-    override fun drawHero(hero: SuperHeroViewModel) = runOnUiThread {
+    override fun drawHero(hero: HeroViewState) = runOnUiThread {
         collapsingToolbar.title = hero.name
         description.text = hero.description.let { if (it.isNotEmpty()) it else getString(string.empty_description) }
         headerImage.loadImageAsync(hero.photoUrl)

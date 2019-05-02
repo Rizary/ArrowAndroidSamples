@@ -6,13 +6,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.github.jorgecastillo.kotlinandroid.R
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.adapter.HeroesCardAdapter.ViewHolder
-import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.SuperHeroViewModel
+import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.HeroViewState
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item_hero_card.view.*
 
 class HeroesCardAdapter(
-        var characters: List<SuperHeroViewModel> = ArrayList(),
-        val itemClick: (SuperHeroViewModel) -> Unit) : RecyclerView.Adapter<ViewHolder>() {
+        var characters: List<HeroViewState> = ArrayList(),
+        val itemClick: (HeroViewState) -> Unit) : RecyclerView.Adapter<ViewHolder>() {
 
   override fun onCreateViewHolder(parent: ViewGroup, pos: Int): ViewHolder {
     val view = LayoutInflater.from(parent.context).inflate(R.layout.item_hero_card, parent, false)
@@ -26,10 +26,10 @@ class HeroesCardAdapter(
   override fun getItemCount() = characters.size
 
   class ViewHolder(view: View,
-      val itemClick: (SuperHeroViewModel) -> Unit) : RecyclerView.ViewHolder(
+      val itemClick: (HeroViewState) -> Unit) : RecyclerView.ViewHolder(
       view) {
 
-    fun bind(hero: SuperHeroViewModel) {
+    fun bind(hero: HeroViewState) {
       with(hero) {
         Picasso.get().load(photoUrl).into(itemView.picture)
         itemView.setOnClickListener { itemClick(this) }

@@ -5,7 +5,7 @@ import arrow.effects.IO
 import arrow.effects.extensions.io.fx.fx
 import com.github.jorgecastillo.kotlinandroid.io.algebras.business.HeroesUseCases
 import com.github.jorgecastillo.kotlinandroid.io.algebras.business.model.CharacterError
-import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.SuperHeroViewModel
+import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.HeroViewState
 import com.karumi.marvelapiclient.model.CharacterDto
 import com.karumi.marvelapiclient.model.MarvelImage.Size.PORTRAIT_UNCANNY
 
@@ -24,12 +24,12 @@ interface SuperHeroesView {
 
 interface SuperHeroesListView : SuperHeroesView {
 
-    fun drawHeroes(heroes: List<SuperHeroViewModel>): Unit
+    fun drawHeroes(heroes: List<HeroViewState>): Unit
 }
 
 interface SuperHeroDetailView : SuperHeroesView {
 
-    fun drawHero(hero: SuperHeroViewModel)
+    fun drawHero(hero: HeroViewState)
 }
 
 /**
@@ -76,7 +76,7 @@ object Presentation {
     }
 }
 
-fun CharacterDto.toViewState() = SuperHeroViewModel(
+fun CharacterDto.toViewState() = HeroViewState(
         id,
         name,
         thumbnail.getImageUrl(PORTRAIT_UNCANNY),

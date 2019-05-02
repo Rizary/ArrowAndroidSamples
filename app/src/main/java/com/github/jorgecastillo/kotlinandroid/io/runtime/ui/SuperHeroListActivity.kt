@@ -10,7 +10,7 @@ import com.github.jorgecastillo.kotlinandroid.R
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.Presentation
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.SuperHeroesListView
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.adapter.HeroesCardAdapter
-import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.SuperHeroViewModel
+import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.HeroViewState
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -48,7 +48,7 @@ class SuperHeroListActivity : AppCompatActivity(), SuperHeroesListView {
         loader.visibility = View.GONE
     }
 
-    override fun drawHeroes(heroes: List<SuperHeroViewModel>) {
+    override fun drawHeroes(heroes: List<HeroViewState>) {
         adapter.characters = heroes
         adapter.notifyDataSetChanged()
     }
