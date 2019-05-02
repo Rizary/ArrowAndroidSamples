@@ -36,6 +36,8 @@ object DataSource {
     }
 
     fun fetchHeroDetails(heroId: String): IO<CharacterDto> = fx {
-        !NonBlocking.effect { fetchHero(heroId) }
+        val hero = !NonBlocking.effect { fetchHero(heroId) }
+        continueOn(Dispatchers.Main)
+        hero
     }
 }

@@ -4,12 +4,11 @@ import android.content.Context
 import arrow.effects.IO
 import arrow.effects.extensions.io.applicativeError.handleError
 import arrow.effects.extensions.io.fx.fx
+import arrow.unsafe
 import com.github.jorgecastillo.kotlinandroid.io.algebras.business.HeroesUseCases
 import com.github.jorgecastillo.kotlinandroid.io.algebras.business.model.CharacterError
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.SuperHeroViewModel
-import com.karumi.marvelapiclient.model.CharacterDto
 import com.karumi.marvelapiclient.model.MarvelImage.Size.PORTRAIT_UNCANNY
-import kotlinx.coroutines.Dispatchers
 
 interface SuperHeroesView {
 
@@ -41,12 +40,14 @@ object Presentation {
     fun onHeroListItemClick(ctx: Context, heroId: String): IO<Unit> =
             Navigation.goToHeroDetailsPage(ctx, heroId)
 
-    private fun displayErrors(view: SuperHeroesView, t: Throwable): IO<Unit> = fx {
-        !effect {
-            when (CharacterError.fromThrowable(t)) {
-                is CharacterError.NotFoundError -> view.showNotFoundError()
-                is CharacterError.UnknownServerError -> view.showGenericError()
-                is CharacterError.AuthenticationError -> view.showAuthenticationError()
+    private fun displayErrors(view: SuperHeroesView, t: Throwable): IO<Unit> = unsafe {
+        fx {
+            !effect {
+                when (CharacterError.fromThrowable(t)) {
+                    is CharacterError.NotFoundError -> view.showNotFoundError()
+                    is CharacterError.UnknownServerError -> view.showGenericError()
+                    is CharacterError.AuthenticationError -> view.showAuthenticationError()
+                }
             }
         }
     }

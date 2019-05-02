@@ -3,7 +3,7 @@ package com.github.jorgecastillo.kotlinandroid.io.runtime.ui
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import arrow.effects.extensions.io.unsafeRun.runBlocking
+import arrow.effects.extensions.io.unsafeRun.runNonBlocking
 import arrow.unsafe
 import com.github.jorgecastillo.kotlinandroid.R
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.Presentation
@@ -11,7 +11,7 @@ import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.SuperHeroesListView
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.adapter.HeroesCardAdapter
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.SuperHeroViewModel
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_main.heroesList
+import kotlinx.android.synthetic.main.activity_main.*
 
 class SuperHeroListActivity : AppCompatActivity(), SuperHeroesListView {
 
@@ -27,14 +27,14 @@ class SuperHeroListActivity : AppCompatActivity(), SuperHeroesListView {
         heroesList.setHasFixedSize(true)
         heroesList.layoutManager = LinearLayoutManager(this)
         adapter = HeroesCardAdapter(itemClick = {
-            unsafe { runBlocking { Presentation.onHeroListItemClick(this@SuperHeroListActivity, it.heroId) } }
+            unsafe { runNonBlocking({ Presentation.onHeroListItemClick(this@SuperHeroListActivity, it.heroId) }, {}) }
         })
         heroesList.adapter = adapter
     }
 
     override fun onResume() {
         super.onResume()
-        unsafe { runBlocking { Presentation.getAllHeroes(this@SuperHeroListActivity) } }
+        unsafe { runNonBlocking({ Presentation.getAllHeroes(this@SuperHeroListActivity) }, {}) }
     }
 
     override fun drawHeroes(heroes: List<SuperHeroViewModel>) {
