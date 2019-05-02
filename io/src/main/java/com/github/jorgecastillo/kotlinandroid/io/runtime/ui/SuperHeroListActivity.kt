@@ -34,7 +34,11 @@ class SuperHeroListActivity : AppCompatActivity(), SuperHeroesListView {
 
     override fun onResume() {
         super.onResume()
-        unsafe { runNonBlocking({ Presentation.getAllHeroes(this@SuperHeroListActivity) }, {}) }
+        unsafe {
+            runNonBlocking(
+                    { Presentation.getAllHeroes() },
+                    { Presentation.handleHeroesListResult(this@SuperHeroListActivity, it) })
+        }
     }
 
     override fun drawHeroes(heroes: List<SuperHeroViewModel>) {

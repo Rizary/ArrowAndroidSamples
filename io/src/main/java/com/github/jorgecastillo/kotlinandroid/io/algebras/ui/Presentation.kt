@@ -1,13 +1,13 @@
 package com.github.jorgecastillo.kotlinandroid.io.algebras.ui
 
 import android.content.Context
+import arrow.core.Either
 import arrow.effects.IO
-import arrow.effects.extensions.io.applicativeError.handleError
 import arrow.effects.extensions.io.fx.fx
-import arrow.unsafe
 import com.github.jorgecastillo.kotlinandroid.io.algebras.business.HeroesUseCases
 import com.github.jorgecastillo.kotlinandroid.io.algebras.business.model.CharacterError
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.SuperHeroViewModel
+import com.karumi.marvelapiclient.model.CharacterDto
 import com.karumi.marvelapiclient.model.MarvelImage.Size.PORTRAIT_UNCANNY
 
 interface SuperHeroesView {
@@ -40,47 +40,55 @@ object Presentation {
     fun onHeroListItemClick(ctx: Context, heroId: String): IO<Unit> =
             Navigation.goToHeroDetailsPage(ctx, heroId)
 
-    private fun displayErrors(view: SuperHeroesView, t: Throwable): IO<Unit> = unsafe {
-        fx {
-            !effect {
-                when (CharacterError.fromThrowable(t)) {
-                    is CharacterError.NotFoundError -> view.showNotFoundError()
-                    is CharacterError.UnknownServerError -> view.showGenericError()
-                    is CharacterError.AuthenticationError -> view.showAuthenticationError()
+    private fun displayErrors(view: SuperHeroesView, t: Throwable) {
+        when (CharacterError.fromThrowable(t)) {
+            is CharacterError.NotFoundError -> view.showNotFoundError()
+            is CharacterError.UnknownServerError -> view.showGenericError()
+            is CharacterError.AuthenticationError -> view.showAuthenticationError()
+        }
+    }
+
+    fun getAllHeroes(): IO<List<CharacterDto>> = fx {
+        !HeroesUseCases.getHeroes()
+    }
+
+    fun handleHeroesListResult(
+            view: SuperHeroesListView,
+            result: Either<Throwable, List<CharacterDto>>): Unit {
+
+        result.fold(
+                ifLeft = { displayErrors(view, it) },
+                ifRight = {
+                    view.drawHeroes(it.map { heroDto ->
+                        SuperHeroViewModel(
+                                heroDto.id,
+                                heroDto.name,
+                                heroDto.thumbnail.getImageUrl(PORTRAIT_UNCANNY),
+                                heroDto.description
+                        )
+                    })
                 }
-            }
-        }
+        )
     }
 
-    fun getAllHeroes(view: SuperHeroesListView): IO<Unit> = fx {
-        val result = !HeroesUseCases.getHeroes()
-        !effect {
-            view.drawHeroes(result.map {
-                SuperHeroViewModel(
-                        it.id,
-                        it.name,
-                        it.thumbnail.getImageUrl(PORTRAIT_UNCANNY),
-                        it.description
-                )
-            })
-        }
-    }.handleError {
-        displayErrors(view, it)
+    fun drawSuperHeroDetails(heroId: String): IO<CharacterDto> = fx {
+        !HeroesUseCases.getHeroDetails(heroId)
     }
 
-    fun drawSuperHeroDetails(heroId: String, view: SuperHeroDetailView): IO<Unit> = fx {
-        val result = !HeroesUseCases.getHeroDetails(heroId)
-        !effect {
-            view.drawHero(
-                    SuperHeroViewModel(
-                            result.id,
-                            result.name,
-                            result.thumbnail.getImageUrl(PORTRAIT_UNCANNY),
-                            result.description
+    fun handleDetailsResult(view: SuperHeroDetailView,
+                            result: Either<Throwable, CharacterDto>): Unit {
+        result.fold(
+                ifLeft = { displayErrors(view, it) },
+                ifRight = { heroDto ->
+                    view.drawHero(
+                            SuperHeroViewModel(
+                                    heroDto.id,
+                                    heroDto.name,
+                                    heroDto.thumbnail.getImageUrl(PORTRAIT_UNCANNY),
+                                    heroDto.description
+                            )
                     )
-            )
-        }
-    }.handleError {
-        displayErrors(view, it)
+                }
+        )
     }
 }

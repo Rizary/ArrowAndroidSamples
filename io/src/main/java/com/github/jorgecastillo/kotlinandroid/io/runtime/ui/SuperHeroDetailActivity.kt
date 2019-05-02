@@ -37,9 +37,13 @@ class SuperHeroDetailActivity : AppCompatActivity(), SuperHeroDetailView {
     override fun onResume() {
         super.onResume()
         intent.extras?.let {
-            val heroId = it.getString(
-                    EXTRA_HERO_ID)
-            unsafe { runNonBlocking({ Presentation.drawSuperHeroDetails(heroId, this@SuperHeroDetailActivity) }, {}) }
+            val heroId = it.getString(EXTRA_HERO_ID)
+            
+            unsafe {
+                runNonBlocking(
+                        { Presentation.drawSuperHeroDetails(heroId) },
+                        { Presentation.handleDetailsResult(this@SuperHeroDetailActivity, it) })
+            }
 
         } ?: closeWithError()
     }
