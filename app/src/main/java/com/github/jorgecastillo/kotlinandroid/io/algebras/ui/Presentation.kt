@@ -6,6 +6,7 @@ import arrow.effects.extensions.io.fx.fx
 import com.github.jorgecastillo.kotlinandroid.io.algebras.business.HeroesUseCases
 import com.github.jorgecastillo.kotlinandroid.io.algebras.business.model.CharacterError
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.SuperHeroViewModel
+import com.karumi.marvelapiclient.model.CharacterDto
 import com.karumi.marvelapiclient.model.MarvelImage.Size.PORTRAIT_UNCANNY
 
 interface SuperHeroesView {
@@ -56,19 +57,8 @@ object Presentation {
         !effect { view.hideLoading() }
         !effect {
             maybeHeroes.fold(
-                    ifLeft = {
-                        displayErrors(view, it)
-                    },
-                    ifRight = {
-                        view.drawHeroes(it.map { heroDto ->
-                            SuperHeroViewModel(
-                                    heroDto.id,
-                                    heroDto.name,
-                                    heroDto.thumbnail.getImageUrl(PORTRAIT_UNCANNY),
-                                    heroDto.description
-                            )
-                        })
-                    }
+                    ifLeft = { displayErrors(view, it) },
+                    ifRight = { view.drawHeroes(it.map { heroDto -> heroDto.toViewState() }) }
             )
         }
     }
@@ -79,20 +69,16 @@ object Presentation {
         !effect { view.hideLoading() }
         !effect {
             maybeHero.fold(
-                    ifLeft = {
-                        displayErrors(view, it)
-                    },
-                    ifRight = { heroDto ->
-                        view.drawHero(
-                                SuperHeroViewModel(
-                                        heroDto.id,
-                                        heroDto.name,
-                                        heroDto.thumbnail.getImageUrl(PORTRAIT_UNCANNY),
-                                        heroDto.description
-                                )
-                        )
-                    }
+                    ifLeft = { displayErrors(view, it) },
+                    ifRight = { heroDto -> view.drawHero(heroDto.toViewState()) }
             )
         }
     }
 }
+
+fun CharacterDto.toViewState() = SuperHeroViewModel(
+        id,
+        name,
+        thumbnail.getImageUrl(PORTRAIT_UNCANNY),
+        description
+)
