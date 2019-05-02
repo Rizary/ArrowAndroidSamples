@@ -23,8 +23,7 @@ class SuperHeroDetailActivity : AppCompatActivity(), SuperHeroDetailView {
 
         fun launch(source: Context, heroId: String) {
             val intent = Intent(source, SuperHeroDetailActivity::class.java)
-            intent.putExtra(
-                    EXTRA_HERO_ID, heroId)
+            intent.putExtra(EXTRA_HERO_ID, heroId)
             source.startActivity(intent)
         }
     }
@@ -38,11 +37,14 @@ class SuperHeroDetailActivity : AppCompatActivity(), SuperHeroDetailView {
         super.onResume()
         intent.extras?.let {
             val heroId = it.getString(EXTRA_HERO_ID)
-            
-            unsafe {
-                runNonBlocking(
-                        { Presentation.drawSuperHeroDetails(heroId) },
-                        { Presentation.handleDetailsResult(this@SuperHeroDetailActivity, it) })
+            if (heroId == null) {
+                closeWithError()
+            } else {
+                unsafe {
+                    runNonBlocking(
+                            { Presentation.drawSuperHeroDetails(heroId) },
+                            { Presentation.handleDetailsResult(this@SuperHeroDetailActivity, it) })
+                }
             }
 
         } ?: closeWithError()
