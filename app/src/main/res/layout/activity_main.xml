@@ -7,11 +7,13 @@
     android:layout_height="match_parent"
     >
 
-    <androidx.core.widget.ContentLoadingProgressBar
+    <ProgressBar
         android:id="@+id/loader"
         android:visibility="gone"
         android:layout_width="@dimen/progress_loader_size"
         android:layout_height="@dimen/progress_loader_size"
+        android:indeterminateTintMode="src_atop"
+        android:indeterminateTint="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

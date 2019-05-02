@@ -3,6 +3,7 @@ package com.github.jorgecastillo.kotlinandroid.io.runtime.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import arrow.effects.extensions.io.unsafeRun.runNonBlocking
@@ -41,17 +42,22 @@ class SuperHeroDetailActivity : AppCompatActivity(), SuperHeroDetailView {
                 closeWithError()
             } else {
                 unsafe {
-                    runNonBlocking(
-                            { Presentation.drawSuperHeroDetails(heroId) },
-                            { Presentation.handleDetailsResult(this@SuperHeroDetailActivity, it) })
+                    runNonBlocking({ Presentation.drawSuperHeroDetails(heroId, this@SuperHeroDetailActivity) }, {})
                 }
             }
-
         } ?: closeWithError()
     }
 
     private fun closeWithError() {
         Toast.makeText(this, string.hero_id_needed, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun showLoading() {
+        loader.visibility = View.VISIBLE
+    }
+
+    override fun hideLoading() {
+        loader.visibility = View.GONE
     }
 
     override fun drawHero(hero: SuperHeroViewModel) = runOnUiThread {

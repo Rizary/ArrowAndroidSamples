@@ -1,6 +1,7 @@
 package com.github.jorgecastillo.kotlinandroid.io.runtime.ui
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import arrow.effects.extensions.io.unsafeRun.runNonBlocking
@@ -35,10 +36,16 @@ class SuperHeroListActivity : AppCompatActivity(), SuperHeroesListView {
     override fun onResume() {
         super.onResume()
         unsafe {
-            runNonBlocking(
-                    { Presentation.getAllHeroes() },
-                    { Presentation.handleHeroesListResult(this@SuperHeroListActivity, it) })
+            runNonBlocking({ Presentation.getAllHeroes(this@SuperHeroListActivity) }, {})
         }
+    }
+
+    override fun showLoading() {
+        loader.visibility = View.VISIBLE
+    }
+
+    override fun hideLoading() {
+        loader.visibility = View.GONE
     }
 
     override fun drawHeroes(heroes: List<SuperHeroViewModel>) {
