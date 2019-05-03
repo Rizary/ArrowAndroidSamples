@@ -62,21 +62,21 @@ class SuperHeroDetailActivity : AppCompatActivity(), SuperHeroDetailView {
         loader.visibility = View.GONE
     }
 
-    override fun drawHero(hero: HeroViewState) = runOnUiThread {
+    override fun drawHero(hero: HeroViewState) {
         collapsingToolbar.title = hero.name
         description.text = hero.description.let { if (it.isNotEmpty()) it else getString(string.empty_description) }
         headerImage.loadImageAsync(hero.photoUrl)
     }
 
-    override fun showNotFoundError() = runOnUiThread {
+    override fun showNotFoundError() {
         Snackbar.make(appBar, string.not_found, Snackbar.LENGTH_SHORT).show()
     }
 
-    override fun showGenericError() = runOnUiThread {
+    override fun showGenericError() {
         Snackbar.make(appBar, string.generic, Snackbar.LENGTH_SHORT).show()
     }
 
-    override fun showAuthenticationError() = runOnUiThread {
+    override fun showAuthenticationError() {
         Snackbar.make(appBar, string.authentication, Snackbar.LENGTH_SHORT).show()
     }
 }
