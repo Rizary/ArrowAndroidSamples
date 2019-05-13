@@ -1,13 +1,12 @@
 package com.github.jorgecastillo.kotlinandroid.io.algebras.persistence
 
 import arrow.Kind
-import arrow.effects.typeclasses.suspended.concurrent.Fx
 import com.github.jorgecastillo.kotlinandroid.BuildConfig
+import com.github.jorgecastillo.kotlinandroid.io.runtime.context.Runtime
 import com.karumi.marvelapiclient.CharacterApiClient
 import com.karumi.marvelapiclient.MarvelApiConfig
 import com.karumi.marvelapiclient.model.CharacterDto
 import com.karumi.marvelapiclient.model.CharactersQuery
-import kotlinx.coroutines.Dispatchers
 
 private val apiClient
     get() = CharacterApiClient(
@@ -26,15 +25,15 @@ private fun fetchHero(heroId: String) =
 private fun fetchHeroes(query: CharactersQuery): List<CharacterDto> =
         apiClient.getAll(query).response.characters
 
-fun <F> Fx<F>.fetchAllHeroes(): Kind<F, List<CharacterDto>> = fx {
+fun <F> Runtime<F>.fetchAllHeroes(): Kind<F, List<CharacterDto>> = fx {
     val query = fetchHeroesQuery()
-    val heroes = !NonBlocking.effect { fetchHeroes(query) }
-    continueOn(Dispatchers.Main)
+    val heroes = !bgDispatcher.effect { fetchHeroes(query) }
+    continueOn(mainDispatcher)
     heroes
 }
 
-fun <F> Fx<F>.fetchHeroDetails(heroId: String): Kind<F, CharacterDto> = fx {
-    val hero = !NonBlocking.effect { fetchHero(heroId) }
-    continueOn(Dispatchers.Main)
+fun <F> Runtime<F>.fetchHeroDetails(heroId: String): Kind<F, CharacterDto> = fx {
+    val hero = !bgDispatcher.effect { fetchHero(heroId) }
+    continueOn(mainDispatcher)
     hero
 }

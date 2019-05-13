@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import arrow.effects.IO
-import arrow.effects.extensions.io.fx.fx
 import arrow.effects.extensions.io.unsafeRun.runNonBlocking
 import arrow.unsafe
 import com.github.jorgecastillo.kotlinandroid.R
@@ -16,8 +15,11 @@ import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.SuperHeroDetailView
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.extensions.loadImageAsync
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.getSuperHeroDetails
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.HeroViewState
+import com.github.jorgecastillo.kotlinandroid.io.runtime.context.RuntimeContext
+import com.github.jorgecastillo.kotlinandroid.io.runtime.context.runtime
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_detail.*
+import kotlinx.coroutines.Dispatchers
 
 class SuperHeroDetailActivity : AppCompatActivity(), SuperHeroDetailView {
 
@@ -30,6 +32,11 @@ class SuperHeroDetailActivity : AppCompatActivity(), SuperHeroDetailView {
             source.startActivity(intent)
         }
     }
+
+    private val ctx = RuntimeContext(
+            bgDispatcher = Dispatchers.IO,
+            mainDispatcher = Dispatchers.Main
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +51,7 @@ class SuperHeroDetailActivity : AppCompatActivity(), SuperHeroDetailView {
                 closeWithError()
             } else {
                 unsafe {
-                    runNonBlocking({ IO.fx().getSuperHeroDetails(heroId, this@SuperHeroDetailActivity) }, {})
+                    runNonBlocking({ IO.runtime(ctx).getSuperHeroDetails(heroId, this@SuperHeroDetailActivity) }, {})
                 }
             }
         } ?: closeWithError()

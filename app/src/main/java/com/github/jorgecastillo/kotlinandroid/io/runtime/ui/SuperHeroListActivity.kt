@@ -5,7 +5,6 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import arrow.effects.IO
-import arrow.effects.extensions.io.fx.fx
 import arrow.effects.extensions.io.unsafeRun.runNonBlocking
 import arrow.unsafe
 import com.github.jorgecastillo.kotlinandroid.R
@@ -14,12 +13,19 @@ import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.adapter.HeroesCardA
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.getAllHeroes
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.HeroViewState
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.onHeroListItemClick
+import com.github.jorgecastillo.kotlinandroid.io.runtime.context.RuntimeContext
+import com.github.jorgecastillo.kotlinandroid.io.runtime.context.runtime
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Dispatchers
 
 class SuperHeroListActivity : AppCompatActivity(), SuperHeroesListView {
 
     private lateinit var adapter: HeroesCardAdapter
+    private val ctx = RuntimeContext(
+            bgDispatcher = Dispatchers.IO,
+            mainDispatcher = Dispatchers.Main
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +37,7 @@ class SuperHeroListActivity : AppCompatActivity(), SuperHeroesListView {
         heroesList.setHasFixedSize(true)
         heroesList.layoutManager = LinearLayoutManager(this)
         adapter = HeroesCardAdapter(itemClick = {
-            unsafe { runNonBlocking({ IO.fx().onHeroListItemClick(this@SuperHeroListActivity, it.heroId) }, {}) }
+            unsafe { runNonBlocking({ IO.runtime(ctx).onHeroListItemClick(this@SuperHeroListActivity, it.heroId) }, {}) }
         })
         heroesList.adapter = adapter
     }
@@ -39,7 +45,7 @@ class SuperHeroListActivity : AppCompatActivity(), SuperHeroesListView {
     override fun onResume() {
         super.onResume()
         unsafe {
-            runNonBlocking({ IO.fx().getAllHeroes(this@SuperHeroListActivity) }, {})
+            runNonBlocking({ IO.runtime(ctx).getAllHeroes(this@SuperHeroListActivity) }, {})
         }
     }
 

@@ -2,11 +2,11 @@ package com.github.jorgecastillo.kotlinandroid.io.algebras.ui
 
 import android.content.Context
 import arrow.Kind
-import arrow.effects.typeclasses.suspended.concurrent.Fx
 import com.github.jorgecastillo.kotlinandroid.io.algebras.business.getHeroDetails
 import com.github.jorgecastillo.kotlinandroid.io.algebras.business.getHeroes
 import com.github.jorgecastillo.kotlinandroid.io.algebras.business.model.CharacterError
 import com.github.jorgecastillo.kotlinandroid.io.algebras.ui.model.HeroViewState
+import com.github.jorgecastillo.kotlinandroid.io.runtime.context.Runtime
 import com.karumi.marvelapiclient.model.CharacterDto
 import com.karumi.marvelapiclient.model.MarvelImage.Size.PORTRAIT_UNCANNY
 
@@ -38,7 +38,7 @@ interface SuperHeroDetailView : SuperHeroesView {
  * type. We'll end up running these methods using a valid F type that support Concurrent behaviors,
  * like IO.
  */
-fun <F> Fx<F>.onHeroListItemClick(ctx: Context, heroId: String): Kind<F, Unit> =
+fun <F> Runtime<F>.onHeroListItemClick(ctx: Context, heroId: String): Kind<F, Unit> =
         goToHeroDetailsPage(ctx, heroId)
 
 private fun displayErrors(view: SuperHeroesView, t: Throwable): Unit {
@@ -49,7 +49,7 @@ private fun displayErrors(view: SuperHeroesView, t: Throwable): Unit {
     }
 }
 
-fun <F> Fx<F>.getAllHeroes(view: SuperHeroesListView): Kind<F, Unit> = fx {
+fun <F> Runtime<F>.getAllHeroes(view: SuperHeroesListView): Kind<F, Unit> = fx {
     !effect { view.showLoading() }
     val maybeHeroes = !getHeroes().attempt()
     !effect { view.hideLoading() }
@@ -61,7 +61,7 @@ fun <F> Fx<F>.getAllHeroes(view: SuperHeroesListView): Kind<F, Unit> = fx {
     }
 }
 
-fun <F> Fx<F>.getSuperHeroDetails(heroId: String, view: SuperHeroDetailView): Kind<F, Unit> = fx {
+fun <F> Runtime<F>.getSuperHeroDetails(heroId: String, view: SuperHeroDetailView): Kind<F, Unit> = fx {
     !effect { view.showLoading() }
     val maybeHero = !getHeroDetails(heroId).attempt()
     !effect { view.hideLoading() }
