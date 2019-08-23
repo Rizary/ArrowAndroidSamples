@@ -73,11 +73,8 @@ dependencies {
   implementation "com.squareup.picasso:picasso:2.71828"
 
   kapt "io.arrow-kt:arrow-meta:$arrow_version"
-  implementation "io.arrow-kt:arrow-core-data:$arrow_version"
-  implementation "io.arrow-kt:arrow-core-extensions:$arrow_version"
-  implementation "io.arrow-kt:arrow-effects-data:$arrow_version" //optional
-  implementation "io.arrow-kt:arrow-effects-extensions:$arrow_version" //optional
-  implementation "io.arrow-kt:arrow-effects-io-extensions:$arrow_version"
+  implementation "io.arrow-kt:arrow-core:$arrow_version"
+  implementation "io.arrow-kt:arrow-fx:$arrow_version"
 
   implementation 'com.karumi:marvelapiclient:1.0.1'
 }

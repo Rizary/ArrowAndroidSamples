@@ -1,34 +1,27 @@
 package com.github.jorgecastillo.kotlinandroid.io.runtime.context
 
-import arrow.effects.ForIO
-import arrow.effects.IO
-import arrow.effects.extensions.IOFx
-import arrow.effects.typeclasses.suspended.concurrent.Fx
-import kotlin.coroutines.CoroutineContext
+import arrow.fx.ForIO
+import arrow.fx.IO
+import arrow.fx.extensions.io.concurrent.concurrent
+import arrow.fx.typeclasses.Concurrent
+import kotlinx.coroutines.CoroutineDispatcher
 
 /**
- * This is the Type class contract for the required dependencies. It can potentially work over any
- * data type F that supports concurrency, or in other words, any data type F that there's an
- * instance of concurrent Fx for.
+ * This context contains the program dependencies. It can potentially work over any data type F that
+ * supports concurrency, or in other words, any data type F that there's an instance of concurrent
+ * Fx for.
  */
-interface Runtime<F> : Fx<F> {
-    val bgDispatcher: CoroutineContext
-    val mainDispatcher: CoroutineContext
-}
+@Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
+abstract class Runtime<F>(
+  val mainDispatcher: CoroutineDispatcher,
+  val bgDispatcher: CoroutineDispatcher,
+  concurrent: Concurrent<F>
+) : Concurrent<F> by concurrent
 
-/**
- * This is the instance of the Runtime we are using to run our app. It works over the IO data type.
- */
-interface IORuntime : Runtime<ForIO>, IOFx
-
-fun IO.Companion.runtime(ctx: RuntimeContext) = object : IORuntime {
-    override val bgDispatcher: CoroutineContext
-        get() = ctx.bgDispatcher
-    override val mainDispatcher: CoroutineContext
-        get() = ctx.mainDispatcher
-}
+fun IO.Companion.runtime(ctx: RuntimeContext) =
+  object : Runtime<ForIO>(ctx.mainDispatcher, ctx.bgDispatcher, IO.concurrent()) {}
 
 data class RuntimeContext(
-        val bgDispatcher: CoroutineContext,
-        val mainDispatcher: CoroutineContext
+  val bgDispatcher: CoroutineDispatcher,
+  val mainDispatcher: CoroutineDispatcher
 )
